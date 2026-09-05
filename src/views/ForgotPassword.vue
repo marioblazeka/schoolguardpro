@@ -12,8 +12,10 @@
             <input id="resetEmail" v-model.trim="email" type="email" class="form-control customs-input" placeholder="name@example.com" autocomplete="email" required />
             <label for="resetEmail">Email adresa</label>
           </div>
-          <div v-if="message" class="alert alert-info py-2 small mb-3" role="status">{{ message }}</div>
-          <button type="submit" class="btn btn-custom-green w-100 py-2 fw-bold text-white shadow-sm mb-3">Pošalji poveznicu</button>
+          <div v-if="message" class="alert py-2 small mb-3" :class="messageType" role="status">{{ message }}</div>
+          <button type="submit" class="btn btn-custom-green w-100 py-2 fw-bold text-white shadow-sm mb-3" :disabled="loading">
+            {{ loading ? 'Slanje...' : 'Pošalji poveznicu' }}
+          </button>
         </form>
         <div class="text-center pt-3 border-top"><router-link to="/login" class="small text-decoration-none link-green fw-semibold">Vratite se na prijavu</router-link></div>
       </div>
@@ -22,10 +24,31 @@
 </template>
 
 <script>
+import { auth } from '@/firebase'
+import { sendPasswordResetEmail } from 'firebase/auth'
+
 export default {
   name: 'ForgotPasswordView',
-  data() { return { email: '', message: '' } },
-  methods: { handleReset() { this.message = 'Firebase ponovno postavljanje lozinke bit će dodano u sljedećem koraku.' } }
+  data() { return { email: '', message: '', messageType: '', loading: false } },
+  methods: {
+    async handleReset() {
+      this.message = ''
+      this.loading = true
+
+      try {
+        await sendPasswordResetEmail(auth, this.email)
+        this.message = 'Poveznica je poslana. Provjerite dolaznu poštu i neželjenu poštu.'
+        this.messageType = 'alert-success'
+      } catch (error) {
+        this.message = error.code === 'auth/invalid-email'
+          ? 'Unesite ispravnu email adresu.'
+          : 'Nije moguće poslati poveznicu. Provjerite email adresu i Firebase postavke.'
+        this.messageType = 'alert-danger'
+      } finally {
+        this.loading = false
+      }
+    }
+  }
 }
 </script>
 

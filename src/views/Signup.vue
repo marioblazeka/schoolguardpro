@@ -90,6 +90,9 @@
 </template>
 
 <script>
+import { auth } from '@/firebase'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+
 export default {
   name: 'SignupView',
 
@@ -104,7 +107,7 @@ export default {
   },
 
   methods: {
-    handleSignup() {
+    async handleSignup() {
       this.errorMessage = ''
 
       if (this.password.length < 6) {
@@ -117,8 +120,24 @@ export default {
         return
       }
 
-      this.errorMessage =
-        'Firebase registracija bit će dodana u sljedećem koraku.'
+      this.loading = true
+
+      try {
+        await createUserWithEmailAndPassword(auth, this.email, this.password)
+        await this.$router.push('/dashboard')
+      } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+          this.errorMessage = 'Ovaj email se već koristi.'
+        } else if (error.code === 'auth/invalid-email') {
+          this.errorMessage = 'Unesite ispravnu email adresu.'
+        } else if (error.code === 'auth/weak-password') {
+          this.errorMessage = 'Lozinka mora biti jača.'
+        } else {
+          this.errorMessage = 'Registracija trenutno nije moguća. Pokušajte ponovno.'
+        }
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
