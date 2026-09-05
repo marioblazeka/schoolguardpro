@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
-import Signup from '../views/Signup.vue' 
-import Forgotpassword from '../views/Forgotpassword.vue'
-import Uvjetikoristenja from '../views/Uvjetikoristenja.vue'
-import Pravilaprivatnosti from '../views/Pravilaprivatnosti.vue'
-import Daashboard from '../views/Daashboard.vue'
+import Signup from '../views/Signup.vue'
+import ForgotPassword from '../views/ForgotPassword.vue'
+import UvjetiKoristenja from '../views/UvjetiKoristenja.vue'
+import PravilaPrivatnosti from '../views/PravilaPrivatnosti.vue'
+import Dashboard from '../views/Dashboard.vue'
 import Unosi from '../views/Unosi.vue'
-
 
 Vue.use(VueRouter)
 
