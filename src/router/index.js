@@ -1,6 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import Login from '../views/Login.vue'
+import Login from '../views/Signup.vue' 
+import Login from '../views/Forgotpassword.vue'
+import Login from '../views/Uvjetikoristenja.vue'
+import Login from '../views/Pravilaprivatnosti.vue'
+import Login from '../views/Daashboard.vue'
+import Login from '../views/Unosi.vue'
+
 
 Vue.use(VueRouter)
 
@@ -11,12 +19,39 @@ const routes = [
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/signup',
+    name: 'Signup',
+    component: Signup
+  },
+  {
+    path: '/forgotpassword',
+    name: 'ForgotPassword',
+    component: ForgotPassword
+  },
+  {
+    path: '/uvjetikoristenja',
+    name: 'UvjetiKoristenja',
+    component: UvjetiKoristenja
+  },
+  {
+    path: '/pravilaprivatnosti',
+    name: 'PravilaPrivatnosti',
+    component: PravilaPrivatnosti
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard
+  },
+  {
+    path: '/unosi',
+    name: 'Unosi',
+    component: Unosi
   }
 ]
 
