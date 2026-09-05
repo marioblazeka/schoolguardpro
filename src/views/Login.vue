@@ -20,7 +20,9 @@
             <label for="loginPassword">Lozinka</label>
           </div>
           <div v-if="errorMessage" class="alert alert-danger py-2 small mb-3" role="alert">{{ errorMessage }}</div>
-          <button type="submit" class="btn btn-custom-green w-100 py-2 fw-bold text-white shadow-sm mb-3">Login</button>
+          <button type="submit" class="btn btn-custom-green w-100 py-2 fw-bold text-white shadow-sm mb-3" :disabled="loading">
+            {{ loading ? 'Prijava...' : 'Login' }}
+          </button>
         </form>
 
         <div class="text-center pt-3 border-top">
@@ -33,14 +35,36 @@
 </template>
 
 <script>
+import { auth } from '@/firebase'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+
+const ADMIN_EMAIL = 'mblazeka@student.unipu.hr'
+
 export default {
   name: 'LoginView',
-  data() {
-    return { email: '', password: '', errorMessage: '' }
-  },
+  data() { return { email: '', password: '', errorMessage: '', loading: false } },
   methods: {
-    handleLogin() {
-      this.errorMessage = 'Firebase prijava bit će dodana u sljedećem koraku.'
+    async handleLogin() {
+      this.errorMessage = ''
+      this.loading = true
+
+      try {
+        const credential = await signInWithEmailAndPassword(auth, this.email, this.password)
+        const isAdmin = credential.user.email === ADMIN_EMAIL
+
+        sessionStorage.setItem('schoolguard_role', isAdmin ? 'admin' : 'user')
+        await this.$router.push('/dashboard')
+      } catch (error) {
+        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+          this.errorMessage = 'Neispravna email adresa ili lozinka.'
+        } else if (error.code === 'auth/too-many-requests') {
+          this.errorMessage = 'Previše pokušaja. Pokušajte ponovno kasnije.'
+        } else {
+          this.errorMessage = 'Prijava trenutno nije moguća. Pokušajte ponovno.'
+        }
+      } finally {
+        this.loading = false
+      }
     }
   }
 }

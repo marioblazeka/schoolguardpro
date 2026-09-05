@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { auth } from '@/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
@@ -46,12 +48,14 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: Dashboard
+    component: Dashboard,
+    meta: { requiresAuth: true }
   },
   {
     path: '/unosi',
     name: 'Unosi',
-    component: Unosi
+    component: Unosi,
+    meta: { requiresAuth: true }
   }
 ]
 
@@ -62,3 +66,22 @@ const router = new VueRouter({
 })
 
 export default router
+
+function getCurrentUser() {
+  return new Promise(resolve => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      unsubscribe()
+      resolve(user)
+    })
+  })
+}
+
+router.beforeEach(async (to, from, next) => {
+  if (!to.matched.some(route => route.meta.requiresAuth)) {
+    next()
+    return
+  }
+
+  const user = await getCurrentUser()
+  next(user ? undefined : { name: 'Login', query: { redirect: to.fullPath } })
+})
